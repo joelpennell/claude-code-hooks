@@ -43,7 +43,7 @@ Copy `ready-move-stop.py` to `~/.claude/hooks/` and merge `settings-snippet.json
 - Subagents end with `SubagentStop`, not `Stop`, so they aren't covered.
 - The phrase lists are English and were tuned on one person's sessions. Expect some noise at first, and read the log.
 - An item that opens "Nothing like..." or "None of..." but is really a move will pass.
-- It reads numbered items (`1.` or `1)`) and top-level bullets. A list written any other way isn't checked.
+- It reads numbered items (`1.` or `1)`) and top-level bullets. A list written any other way isn't checked, and a plain bulleted note under My moves that isn't a move can be read as one and block the turn once.
 
 ## When to retire it
 

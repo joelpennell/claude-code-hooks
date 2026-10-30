@@ -21,10 +21,10 @@ The rule I use for anything added on top of a stock Claude setup, whether it's a
 | | macOS | Linux | Windows |
 |---|---|---|---|
 | pkill-guard | Tested; this is what it's for | Works, but refuses some commands that GNU `pkill` would have handled fine. Harmless, and you may not need it | Untested; no `pkill` there |
-| ready-move-stop | Tested | Expected to work; untested | Untested |
-| compaction-ledger | Tested | Expected to work; untested | Untested |
+| ready-move-stop | Tested | Test suite passes; not used day to day | Untested |
+| compaction-ledger | Tested | Test suite passes; not used day to day | Untested |
 
-All three need Python 3.8 or later (the tests also pass on 3.8 in a Linux container). On Windows the command may be `python` rather than `python3`, and the paths in the snippets assume a Unix-style home folder.
+All three need Python 3.8 or later. The Linux column means the full test suite passes on Python 3.8 in a Linux container, not that I've run them there. On Windows the command may be `python` rather than `python3`, and the paths in the snippets assume a Unix-style home folder.
 
 ## Installing by hand
 
