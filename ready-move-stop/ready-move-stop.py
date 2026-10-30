@@ -46,7 +46,8 @@ OPENS_NOW = re.compile(r"^(\*\*)?(meanwhile|now|in parallel)\b", re.I)
 EMPTY = re.compile(r"^(\*\*)?(nothing|none)\b", re.I)  # "Nothing." / "None." is no move at all
 HEAD = re.compile(r"^\W*my moves\b", re.I | re.M)
 YOURS = re.compile(r"^\W*your moves\b", re.I)
-ITEM = re.compile(r"^\s{0,3}(\d+)\.\s+(.*)")
+# "1." or "1)" (indented up to 3 spaces), or a top-level "-", "*" or "•" bullet (indented at most 1)
+ITEM = re.compile(r"^(?:\s{0,3}\d+[.)]|\s?[-*\u2022])\s+(?P<text>.*)")
 DONE = re.compile(r"<tool-use-id>(toolu_\w+)</tool-use-id>\s*(?:<output-file>[^<]*</output-file>\s*)?<status>(completed|failed|killed|stopped|timed_out|error)", re.S)
 
 
@@ -107,7 +108,7 @@ def last_reply(path):
 
 
 def my_moves(text):
-    """Numbered items under the last 'My moves' heading, each with its continuation lines."""
+    """Numbered or bulleted items under the last 'My moves' heading, each with its continuation lines."""
     heads = list(HEAD.finditer(text))
     if not heads:
         return []
@@ -117,7 +118,7 @@ def my_moves(text):
             break
         m = ITEM.match(line)
         if m:
-            cur = [m.group(2)]
+            cur = [m.group("text")]
             items.append(cur)
         elif cur is not None and line.strip():
             cur.append(line.strip())

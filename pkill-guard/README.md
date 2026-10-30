@@ -34,3 +34,7 @@ Copy `pkill-guard.py` to `~/.claude/hooks/`, then merge `settings-snippet.json` 
 - It applies macOS (BSD) rules everywhere. On Linux with GNU procps, where `pkill` accepts options after the pattern (checked with procps-ng 4.0.4's `pgrep`), it refuses commands that would have been fine. That's the cost of a refusal, not a danger.
 - The 4-character minimum is a judgment call, not a measured threshold.
 - `kill <exact PID>`, after `pgrep` shows what a pattern matches, avoids the problem entirely.
+
+## When to retire it
+
+This one guards a macOS quirk, not a model weakness, so a better model doesn't make it obsolete: a model that never makes the mistake still costs nothing here, because the hook only speaks when it refuses. Retire it if your agent never kills processes, if you don't use macOS, or if `man pkill` on your Mac ever says options are read after the pattern. To check whether it's still firing, look for "pkill-guard:" refusals in your sessions.

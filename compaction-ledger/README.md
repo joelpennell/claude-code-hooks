@@ -43,3 +43,7 @@ echo '{"session_id":"x","transcript_path":"/path/to/copy.jsonl","source":"compac
 - The ledger keeps everything you typed in the session, including anything pasted by mistake, such as a key. It's written with owner-only permissions, and nothing deletes or rotates it, so clear out old ledgers yourself.
 - The digest is cut to fit under 9,000 bytes. The full ledger file always has everything.
 - It treats transcript contents as data and never runs anything from them, but the text it puts back into context is whatever was in the transcript.
+
+## When to retire it
+
+This one exists because compaction summaries got the AI's own state wrong, most often saying a reply hadn't gone out when it had (6 of 8 times when I scored them in October 2026). After a Claude Code update or a model change, compare the next few summaries with their ledgers. If the summaries get it right every time, or Claude Code starts carrying that state across a compaction itself, retire it. If you've turned automatic compaction off, it never fires and you don't need it.

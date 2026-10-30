@@ -38,10 +38,13 @@ Copy `ready-move-stop.py` to `~/.claude/hooks/` and merge `settings-snippet.json
 
 ## Limits
 
-- It only reads numbered items written `1.`, `2.` and so on. Items written `1)` or as bullets aren't checked.
-
 - It can't tell whether a stated wait is real. "When the review reports" passes even when no review is running.
 - While a background job is running, it lets a forgotten ready move through.
 - Subagents end with `SubagentStop`, not `Stop`, so they aren't covered.
 - The phrase lists are English and were tuned on one person's sessions. Expect some noise at first, and read the log.
 - An item that opens "Nothing like..." or "None of..." but is really a move will pass.
+- It reads numbered items (`1.` or `1)`) and top-level bullets. A list written any other way isn't checked.
+
+## When to retire it
+
+This one exists because of how models behaved in October 2026: ending a turn with work they could have done on their own. Newer models may stop doing that. Every block is logged to `~/.claude/logs/ready-move-hook.log` with the move it caught, so after a model change, read the log for two weeks. If the blocks are mostly noise (moves that really did wait on you) and the real catches have dropped to almost none, turn it off. Retire it too if Claude Code adds its own check for this.

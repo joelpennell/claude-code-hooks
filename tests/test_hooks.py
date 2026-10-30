@@ -111,6 +111,15 @@ class ReadyMoveStop(unittest.TestCase):
         code, _, _ = self.stop("**My moves:**\n1. When you reply, deploy it.\n2. Meanwhile, update the docs.")
         self.assertEqual(code, 2)
 
+    def test_paren_numbers_and_bullets_are_read(self):
+        self.assertEqual(self.stop("**My moves:**\n1) Run the test suite.")[0], 2)
+        self.assertEqual(self.stop("**My moves:**\n- Run the test suite.")[0], 2)
+        self.assertEqual(self.stop("**My moves:**\n- When you reply, deploy it.")[0], 0)
+
+    def test_nested_detail_stays_with_its_item(self):
+        code, _, _ = self.stop("**My moves:**\n1. When you reply, deploy it.\n   - check the logs first")
+        self.assertEqual(code, 0)
+
     def test_nothing_is_no_move(self):
         self.assertEqual(self.stop("**My moves:**\n1. Nothing.")[0], 0)
 
