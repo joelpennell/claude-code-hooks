@@ -6,7 +6,7 @@ It's built around a reply convention: each reply ends with a numbered **Your mov
 
 ## Why it exists
 
-On 18 October 2026 four of my sessions ended a turn with a My move they could have done on their own, then sat idle for 9 to 10.5 hours until I came back. The rule was then written down in plain words. The same day, the session that wrote it broke it in its very next turn. A sentence in an instructions file wasn't enough, so this hook makes the rule a mechanism.
+On 18 October 2026 four of my sessions ended a turn with a My move they could have done on their own, then sat idle for 9 to nearly 11 hours until I came back. The rule was then written down in plain words, and the session that wrote it broke it in its very next turn. A sentence in an instructions file wasn't enough, so this hook makes the rule a mechanism.
 
 ## How it works
 
@@ -32,7 +32,13 @@ The version I run names me directly. This copy reads the name from `READY_MOVE_O
 - **An independent review** by a separate model found nothing serious. It did find two medium issues, a slow regular expression and eight missed ways of saying "waiting", and both were fixed.
 - **Ten days of real use (19 to 28 October 2026):** 34 real blocks. 17 were noise, mostly moves gated on my word in phrasings the hook didn't know ("On a yes:", `On "deploy it":`) and empty moves ("Nothing."). The phrase lists were widened, and a replay of all 34 confirmed those 17 now pass while the other 17 still block. Those 17 haven't all been judged yet. Several look like real misses, and several look like waits the item didn't name.
 
+## Install
+
+Copy `ready-move-stop.py` to `~/.claude/hooks/` and merge `settings-snippet.json` into `~/.claude/settings.json`. Replace `YourFirstName` in the snippet with your own first name (it's how the hook recognises a move that waits on you), or delete `READY_MOVE_OWNER=YourFirstName ` and it will look for "the user" instead. Run `/hooks` to confirm it's loaded.
+
 ## Limits
+
+- It only reads numbered items written `1.`, `2.` and so on. Items written `1)` or as bullets aren't checked.
 
 - It can't tell whether a stated wait is real. "When the review reports" passes even when no review is running.
 - While a background job is running, it lets a forgotten ready move through.

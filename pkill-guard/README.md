@@ -25,12 +25,12 @@ Copy `pkill-guard.py` to `~/.claude/hooks/`, then merge `settings-snippet.json` 
 
 ## Tested
 
-`tests/run.sh` at the top of this repo feeds it the incident's command, a safe reordering of it, a short `-f` pattern, a trailing flag inside a `&&` chain, an option that takes a value, an unrelated command and input that isn't JSON. A copy with the check disabled fails those tests. Whether it has blocked a real command since it was installed hasn't been recorded.
+`tests/run.sh` at the top of this repo feeds it the incident's command, a safe reordering of it, a short `-f` pattern, a trailing flag inside a `&&` chain or on a later line, the same command behind `sudo`, `env`, `timeout` or `bash -c`, signal options such as `-HUP` and `-9`, an option that takes a value, an unrelated command and input that isn't JSON. A copy with the check disabled fails those tests. Whether it has blocked a real command since it was installed hasn't been recorded.
 
 ## Limits
 
-- It reads the command text only. A kill inside a script, `sh -c "..."`, `eval` or `xargs` isn't seen.
+- It's a guard against accidents, not against someone trying to get past it. It reads the command text only. It looks through common wrappers (`sudo`, `env`, `timeout`, `nohup`, `nice`, `xargs`) and into `sh`/`bash`/`zsh -c "..."`, but a kill inside a script, `eval`, a variable or a command substitution isn't seen.
 - If the shell quoting can't be parsed, it lets the command through rather than guess.
-- It applies macOS (BSD) rules everywhere. On Linux, where `pkill` accepts options after the pattern, it refuses commands that would have been fine. That's the cost of a refusal, not a danger.
+- It applies macOS (BSD) rules everywhere. On Linux with GNU procps, where `pkill` accepts options after the pattern (checked with procps-ng 4.0.4's `pgrep`), it refuses commands that would have been fine. That's the cost of a refusal, not a danger.
 - The 4-character minimum is a judgment call, not a measured threshold.
 - `kill <exact PID>`, after `pgrep` shows what a pattern matches, avoids the problem entirely.

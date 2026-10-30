@@ -24,10 +24,15 @@ import sys
 TOOLS = {"pkill", "pgrep", "killall"}
 # BSD pkill/pgrep options that consume the next argument
 TAKES_ARG = set("FGgJPsTtUu")
-SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "\n"}
+SEPARATORS = {";", "&&", "||", "|", "&", "(", ")"}
+# commands that run another command after their own options
+WRAPPERS = {"sudo", "env", "nohup", "command", "exec", "time", "timeout", "xargs", "nice"}
+SHELLS = {"sh", "bash", "zsh", "dash"}
 
 
 def split_commands(cmd):
+    # shlex treats a newline as plain whitespace, so mark line breaks as separators
+    cmd = cmd.replace("\n", " ; ")
     lex = shlex.shlex(cmd, posix=True, punctuation_chars=";&|()")
     lex.whitespace_split = True
     lex.commenters = ""
@@ -43,13 +48,46 @@ def split_commands(cmd):
         yield current
 
 
+def strip_wrappers(argv):
+    """Drop env assignments and wrappers (sudo -u x, timeout 5, env A=1 ...)."""
+    while argv:
+        head = os.path.basename(argv[0]).lower()
+        if "=" in argv[0] and not argv[0].startswith("-"):
+            argv = argv[1:]
+        elif head in WRAPPERS:
+            argv = argv[1:]
+            # the wrapper's own options and their values, then a duration for timeout
+            while argv and (argv[0].startswith("-") or "=" in argv[0]
+                            or (head == "timeout" and argv[0][:1].isdigit())):
+                if argv[0] in ("-u", "-g", "-n", "-s", "-k", "-C", "-I") and head != "env" and len(argv) > 1 \
+                        and not argv[1].startswith("-") and os.path.basename(argv[1]).lower() not in TOOLS:
+                    argv = argv[1:]
+                argv = argv[1:]
+        else:
+            return argv
+    return argv
+
+
 def problem(argv):
-    # skip leading env assignments / sudo
-    while argv and ("=" in argv[0] and not argv[0].startswith("-") or argv[0] == "sudo"):
-        argv = argv[1:]
-    if not argv or os.path.basename(argv[0]) not in TOOLS:
+    argv = strip_wrappers(argv)
+    if not argv:
         return None
-    tool = os.path.basename(argv[0])
+    head = os.path.basename(argv[0]).lower()
+    if head in SHELLS and "-c" in argv[1:]:
+        # check the command string a shell is asked to run
+        i = argv.index("-c")
+        if i + 1 < len(argv):
+            try:
+                for inner in split_commands(argv[i + 1]):
+                    msg = problem(inner)
+                    if msg:
+                        return msg
+            except ValueError:
+                return None
+        return None
+    if head not in TOOLS:
+        return None
+    tool = head
     args = argv[1:]
     full_match = False
     patterns = []
@@ -67,6 +105,9 @@ def problem(argv):
             break
         elif a.startswith("-") and len(a) > 1:
             letters = a[1:]
+            if tool != "pgrep" and (letters.isdigit() or (len(letters) > 1 and letters.isupper())):
+                i += 1  # a signal (-9, -HUP, -INT): takes no value
+                continue
             if "f" in letters:
                 full_match = True
             if letters[-1] in TAKES_ARG and tool != "killall":
@@ -89,7 +130,7 @@ def main():
         cmd = data.get("tool_input", {}).get("command", "")
     except Exception:
         return 0
-    if not any(t in cmd for t in TOOLS):
+    if not any(t in cmd.lower() for t in TOOLS):
         return 0
     try:
         commands = list(split_commands(cmd))

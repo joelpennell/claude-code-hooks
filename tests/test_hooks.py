@@ -68,6 +68,23 @@ class PkillGuard(unittest.TestCase):
     def test_option_value_is_not_a_pattern(self):
         self.assertEqual(self.decide("pkill -u nobody -f long-pattern"), "allow")
 
+    def test_multiline_commands_are_split(self):
+        self.assertEqual(self.decide('echo hi\npkill -f "gh run watch 123" -n'), "deny")
+        self.assertEqual(self.decide("pkill -f foo_bar\nls -la"), "allow")
+
+    def test_wrappers_and_shells_are_looked_through(self):
+        for c in ('bash -c "pkill -f abc_def -n"', 'sudo -u root pkill -f "abc def" -n',
+                  'sudo -n pkill -f "abc def" -n', 'env A=1 pkill -f "abc def" -n',
+                  'timeout 5 pkill -f "abc def" -n', 'PKILL -f "abc def" -n'):
+            self.assertEqual(self.decide(c), "deny", c)
+
+    def test_signal_names_take_no_value(self):
+        self.assertEqual(self.decide("pkill -HUP -f ab"), "deny")
+        self.assertEqual(self.decide("pkill -INT -f x"), "deny")
+        self.assertEqual(self.decide('pkill -HUP -f "gh run watch 123"'), "allow")
+        self.assertEqual(self.decide('pkill -9 -f "gh run watch 123"'), "allow")
+        self.assertEqual(self.decide("killall -HUP Dock"), "allow")
+
     def test_unrelated_and_bad_input_pass(self):
         self.assertEqual(self.decide("ls -la"), "allow")
         code, out, _ = run(self.S, "not json")
