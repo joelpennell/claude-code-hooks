@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          { "type": "command", "command": "python3 -I ~/.claude/hooks/compaction-ledger.py", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}

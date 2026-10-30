@@ -1,0 +1,6 @@
+{"type": "user", "timestamp": "2026-10-30T09:00:00Z", "message": {"role": "user", "content": "before the first compaction, set up the project"}}
+{"type": "assistant", "timestamp": "2026-10-30T09:01:00Z", "message": {"role": "assistant", "stop_reason": "end_turn", "content": [{"type": "text", "text": "Set up.\n\nI'll do the old thing later."}]}}
+{"type": "system", "subtype": "compact_boundary", "timestamp": "2026-10-30T10:00:00Z", "compactMetadata": {"preTokens": 210000}}
+{"type": "user", "timestamp": "2026-10-30T10:10:00Z", "message": {"role": "user", "content": "please plan the database migration"}}
+{"type": "attachment", "timestamp": "2026-10-30T10:12:00Z", "attachment": {"type": "queued_command", "prompt": "also check the logs", "humanTurn": true}}
+{"type": "assistant", "timestamp": "2026-10-30T10:30:00Z", "message": {"role": "assistant", "stop_reason": "end_turn", "content": [{"type": "text", "text": "Plan is in PLAN.md.\n\nI'll write the migration notes next.\n\n**Your moves:**\n1. Read PLAN.md.\n\n**My moves:**\n1. Run the dry run when you say go."}]}}

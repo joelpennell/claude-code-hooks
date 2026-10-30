@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "READY_MOVE_OWNER=YourFirstName python3 -I ~/.claude/hooks/ready-move-stop.py" }
+        ]
+      }
+    ]
+  }
+}

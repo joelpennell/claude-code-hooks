@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python3 -I ~/.claude/hooks/pkill-guard.py", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
