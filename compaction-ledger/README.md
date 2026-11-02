@@ -44,6 +44,18 @@ echo '{"session_id":"x","transcript_path":"/path/to/copy.jsonl","source":"compac
 - The digest is cut to fit under 9,000 bytes. The full ledger file always has everything.
 - It treats transcript contents as data and never runs anything from them, but the text it puts back into context is whatever was in the transcript.
 
+## Pair it with a Compact Instructions section
+
+A reader suggested a step I hadn't tested: a `## Compact Instructions` section in your CLAUDE.md that tells the summary what to keep. I now run one alongside this hook:
+
+```markdown
+## Compact Instructions
+
+In the summary, list every action already taken outside the conversation (messages sent, commits, pushes, deploys, posts, files deleted), each with its time. Never describe one of these as pending unless the transcript shows it was not done.
+```
+
+In the six compactions that followed (1 and 2 November 2026), four summaries carried that list, and the ones I checked were accurate about what had been done. All six still listed the last reply as something to do after it had gone out. The section can't fix that case: Claude Code keeps the last few messages word for word after the summary, and its own note says the summary is written without seeing them. In all 136 compactions on my disk that followed a long pause, the last reply was in that kept part. So the section is a cheap layer for the rest of the record, and this hook covers the last reply.
+
 ## When to retire it
 
-This one exists because compaction summaries got the AI's own state wrong, typically saying a reply hadn't gone out when it had. That happened in 6 of the 8 compactions whose summaries were checked in October 2026 (Claude did the scoring, from the transcripts). After a Claude Code update or a model change, compare the next few summaries with their ledgers. If the summaries get it right every time, or Claude Code starts carrying that state across a compaction itself, retire it. It fires on both automatic compaction and a manual `/compact`, so if you never compact either way, it never fires and you don't need it.
+This one exists because compaction summaries got the AI's own state wrong, typically saying a reply hadn't gone out when it had. That happened in 6 of the 8 compactions whose summaries were checked in October 2026 (Claude did the scoring, from the transcripts). After a Claude Code update or a model change, compare the next few summaries with their ledgers. If the summaries get it right every time, or Claude Code starts carrying that state across a compaction itself, retire it. A quick signal to watch for: today every summary ends with Claude Code's note that "the summary was written without seeing" the messages kept after it. If that note goes away, the summary may now see the last reply, so check a few summaries then. It fires on both automatic compaction and a manual `/compact`, so if you never compact either way, it never fires and you don't need it.
