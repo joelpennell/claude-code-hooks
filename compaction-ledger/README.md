@@ -55,6 +55,7 @@ What to know before relying on it:
 - "Ran without error" means the tool succeeded. It doesn't mean the effect was checked: a click on a Reply button can succeed without posting.
 - A command piped into `tail` or followed by `;` hides its own exit status; those are labelled, and in some sessions they're most of the list.
 - It recognizes actions by pattern. A deploy or a file move run through your own script can be missed, so an action that isn't listed isn't evidence that nothing was done.
+- The hook's code behaves the same under any model, so the list itself doesn't depend on the model. What does is whether the session follows the digest's instructions (the three lines, checking before redoing). Every session I've scored ran Claude Opus 5.5; I haven't tested a smaller model, and a smaller one may follow a long digest less reliably.
 - The list takes up to a third of the digest, so fewer of your own messages fit there (on one long session, 5 of 26 instead of 14). All of them are still in the ledger file.
 
 ## Pair it with a Compact Instructions section
