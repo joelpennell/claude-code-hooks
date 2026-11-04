@@ -51,7 +51,7 @@ A reader on X suggested it: summaries are easier to trust with a note, outside t
 
 How it was tested (4 November 2026): two independent reviews on another model. The first broke the original version in three must-fix ways (a failed `git push 2>&1 | tail` reported as a success, quoted text read as commands, and `<<<` swallowing the rest of a script). The second broke the rewrite in eight more (escaped quotes, a comment with an apostrophe, `if git push; then`, `bash -c "git push"` and others), which led to reading shell commands with Python's own shell tokenizer. Every input from both reviews is now a test. On five real transcripts from five projects, the commits and pushes it lists match a separate count call by call.
 
-How often it matters: across 141 of my compactions that followed a long pause, a summary called an already-finished action pending once (a merged pull request listed as still to merge). The error that keeps happening is the last reply, below. The list is cheap insurance for a rare case.
+How often it matters: in 141 of my compactions that followed a long pause, I found one summary that called an already-finished action pending (a merged pull request listed as still to merge). Most were scored in one pass by a small model and only merges and pushes were cross-checked, so a few may have been missed. The error that keeps happening is the last reply, below. The list is cheap insurance for a rare case.
 
 What to know before relying on it:
 - "Ran without error" means the tool succeeded. It doesn't mean the effect was checked: a click on a Reply button can succeed without posting.
