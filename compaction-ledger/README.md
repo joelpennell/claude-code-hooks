@@ -7,6 +7,7 @@ It writes a ledger to `~/.claude/ledgers/<session-id>.md` (mode 600) with:
 - everything the user typed in the session, word for word with times, including messages typed while Claude was mid-turn and slash commands run;
 - whether the last reply before the compaction had been delivered, and how long before, so "did that reply go out?" has a factual answer;
 - Claude's own candidate open loops from its replies before the compaction: its "My moves", "I'll ..." lines and questions, labelled as unchecked.
+- the actions the session already took outside the conversation (commits, pushes, deploys, pull-request merges, messages sent, posts and submits in the browser, deletions, web requests that change something), each with when it was called and what its tool result says: ran without error, failed or refused, started in the background, or ran with its exit status hidden by a pipe.
 
 It also prints a digest of that ledger (under 9,000 bytes), which Claude Code adds to the session's context. The digest asks the session to say three things before carrying on: what the summary dropped, whether the last reply went out, and what is still open.
 
@@ -43,6 +44,18 @@ echo '{"session_id":"x","transcript_path":"/path/to/copy.jsonl","source":"compac
 - The ledger keeps everything you typed in the session, including anything pasted by mistake, such as a key. It's written with owner-only permissions, and nothing deletes or rotates it, so clear out old ledgers yourself.
 - The digest is cut to fit under 9,000 bytes. The full ledger file always has everything.
 - It treats transcript contents as data and never runs anything from them, but the text it puts back into context is whatever was in the transcript.
+
+## The actions list
+
+A reader on X suggested it: summaries are easier to trust with a note, outside the chat, of each action the agent finished. Every action is already in the transcript as a tool call with its result, so the hook reads them back. The digest lists anything that failed, was refused or didn't finish first, then the rest, and asks the session to check whether an action took effect before redoing one the summary calls pending.
+
+How it was tested (4 November 2026): two independent reviews on another model. The first broke the original version in three must-fix ways (a failed `git push 2>&1 | tail` reported as a success, quoted text read as commands, and `<<<` swallowing the rest of a script). The second broke the rewrite in eight more (escaped quotes, a comment with an apostrophe, `if git push; then`, `bash -c "git push"` and others), which led to reading shell commands with Python's own shell tokenizer. Every input from both reviews is now a test. On five real transcripts from five projects, the commits and pushes it lists match a separate count call by call.
+
+What to know before relying on it:
+- "Ran without error" means the tool succeeded. It doesn't mean the effect was checked: a click on a Reply button can succeed without posting.
+- A command piped into `tail` or followed by `;` hides its own exit status; those are labelled, and in some sessions they're most of the list.
+- It recognizes actions by pattern. A deploy or a file move run through your own script can be missed, so an action that isn't listed isn't evidence that nothing was done.
+- The list takes up to a third of the digest, so fewer of your own messages fit there (on one long session, 5 of 26 instead of 14). All of them are still in the ledger file.
 
 ## Pair it with a Compact Instructions section
 
